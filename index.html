@@ -7,8 +7,13 @@
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
             type="application/javascript"></script>
     <script type="application/javascript">
-        async function buttonClicked() {
-            const response = await getAccountInfo()
+        async function connectEthers() {
+            const response = await getEthersAccountInfo(window.ethereum)
+            document.getElementById("account").innerText = `Account: ${response.address}`
+            document.getElementById("balance").innerText = `Balance: ${response.balance}`
+        }
+        async function connectTronlink() {
+            const response = await getTronlinkAccountInfo(window.tronLink)
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
@@ -17,6 +22,7 @@
 <body>
 <p id="account">Account: n/a</p>
 <p id="balance">Balance: n/a</p>
-<button onclick="buttonClicked()">Click Me</button>
+<button onclick="connectEthers()">Connect Ethers</button>
+<button onclick="connectTronlink()">Connect Tronlink</button>
 </body>
 </html>
