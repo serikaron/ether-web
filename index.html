@@ -13,9 +13,14 @@
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
         async function connectTronlink() {
-            const response = await getTronlinkAccountInfo(window.tronLink)
+            const response = await getTronlinkAccountInfo()
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
+        }
+    </script>
+    <script type="application/javascript">
+        window.onload = function () {
+            checkPlugin()
         }
     </script>
 </head>

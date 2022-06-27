@@ -13,30 +13,39 @@ async function getEthersAccountInfo(ethereum) {
     return {address, balance: balance.toString()}
 }
 
-async function getTronlinkAccountInfo(tronLink) {
-    if (!tronLink.ready) {
-        throw new Error("Tronlink is not ready")
+async function getTronlinkAccountInfo() {
+    if (!window.tronLink.ready) {
+        // throw new Error("TronLink is not ready")
+        await initTronLink()
     }
-    if (!tronLink.tronWeb) {
-        throw new Error("Tronlink is not ready")
+    if (!window.tronLink.tronWeb) {
+        throw new Error("TronLink is not ready")
     }
-    if (!tronLink.tronWeb.defaultAddress) {
+    if (!window.tronLink.tronWeb.defaultAddress) {
         throw new Error("tronWeb.defaultAddress is not defined")
     }
-    const res = await tronLink.request({method: "tron_requestAccounts"})
-    console.log(`res: ${JSON.stringify(res)}`)
-    if (res.code === 4001) {
-        throw new Error(`Tronlink error: ${res.message}`)
-    }
-    const address = await tronLink.tronWeb.defaultAddress.base58
-    const balance = await tronLink.tronWeb.trx.getBalance(address)
+    const address = await window.tronLink.tronWeb.defaultAddress.base58
+    const balance = await window.tronLink.tronWeb.trx.getBalance(address)
     console.log(`address: ${address}, balance: ${balance}`)
     return {address, balance}
 }
 
-// async function initTronlink(window) {
-//     window.tronLink = {
-//         ready: true,
-//         tronWeb: window.tronWeb
-//     }
-// }
+function checkPlugin() {
+    if (typeof window.ethereum === 'undefined') {
+        throw new Error("Ethereum is not installed")
+    }
+    if (typeof window.tronLink === 'undefined') {
+        throw new Error("TronLink is not installed")
+    }
+}
+
+async function initTronLink() {
+    const res = await window.tronLink.request({method: "tron_requestAccounts"})
+    console.log(`res: ${JSON.stringify(res)}`)
+    if (typeof res.code === 'undefined') {
+        throw new Error("Login TronLink first")
+    }
+    if (res.code === 4001) {
+        throw new Error(`TronLink error: ${res.message}`)
+    }
+}
