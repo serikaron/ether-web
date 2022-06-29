@@ -1,3 +1,5 @@
+"use strict";
+
 async function getEthersAccountInfo(ethereum) {
     console.log("Getting ethers account info");
     if (typeof ethereum === 'undefined') {
