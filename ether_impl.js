@@ -32,6 +32,18 @@ async function getTronlinkAccountInfo() {
     return {address, balance}
 }
 
+async function tronLinkApproval(tokenAddress, contractAddress, amount) {
+    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+    const res = await token.approve(contractAddress, amount).send()
+    console.log(`res: ${JSON.stringify(res)}`)
+}
+
+async function checkTronLinkApproval(tokenAddress, contractAddress) {
+    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+    const res = await token.allowance(window.tronLink.tronWeb.defaultAddress.base58, contractAddress).call()
+    console.log(`res: ${JSON.stringify(res)}`)
+}
+
 function checkPlugin() {
     if (typeof window.ethereum === 'undefined') {
         throw new Error("Ethereum is not installed")

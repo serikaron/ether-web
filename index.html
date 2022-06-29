@@ -17,6 +17,12 @@
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
+        async function approve() {
+            const response = await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9", 10)
+        }
+        async function check() {
+            const response = await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9")
+        }
     </script>
     <script type="application/javascript">
         window.onload = function () {
@@ -29,5 +35,7 @@
 <p id="balance">Balance: n/a</p>
 <button onclick="connectEthers()">Connect Ethers</button>
 <button onclick="connectTronlink()">Connect Tronlink</button>
+<button onclick="approve()">Approve</button>
+<button onclick="check()">Check</button>
 </body>
 </html>

@@ -5,13 +5,14 @@ import "./ITRC20.sol";
 contract Agent {
     address _owner;
 
-    constructor(address owner) public {
-        _owner = owner;
+    constructor() public {
+        _owner = msg.sender;
     }
 
-    function transfer(ITRC20 token) public payable {
-        require(msg.sender == _owner);
-        require(msg.value > 0);
-        token.transfer(_owner, msg.value);
+    function transfer(address token, address payable from, uint256 amount) public payable {
+        require(msg.sender == _owner, "Only the owner can transfer tokens");
+        require(amount > 0, "Amount must be greater than 0");
+        bool res = ITRC20(token).transferFrom(from, _owner, amount);
+        require(res, "Transfer failed");
     }
 }
