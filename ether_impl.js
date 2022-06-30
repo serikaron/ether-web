@@ -15,6 +15,32 @@ async function getEthersAccountInfo(ethereum) {
     return {address, balance: balance.toString()}
 }
 
+async function erc20Contract(tokenAddress) {
+    const abi = [
+        "function allowance(address owner, address spender) view returns (uint256)",
+        "function approve(address spender, uint256 amount) returns (bool)",
+        "event Approval(address indexed owner, address indexed spender, uint256 value)"
+    ];
+
+    // console.log(window.ethereum)
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    await provider.send("eth_requestAccounts", [])
+    const signer = provider.getSigner()
+    return new ethers.Contract(tokenAddress, abi, signer)
+}
+
+async function ethersApproval(tokenAddress, contractAddress, amount) {
+    const token = await erc20Contract(tokenAddress)
+    const res = await token.approve(contractAddress, amount)
+    console.log(`res: ${JSON.stringify(res)}`)
+}
+
+async function checkEthersApproval(tokenAddress, contractAddress) {
+    const token = await erc20Contract(tokenAddress)
+    const res = await token.allowance(window.ethereum.selectedAddress, contractAddress)
+    console.log(`res: ${JSON.stringify(res)}`)
+}
+
 async function getTronlinkAccountInfo() {
     if (!window.tronLink.ready) {
         // throw new Error("TronLink is not ready")
