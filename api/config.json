@@ -1,0 +1,46 @@
+{
+  "eth": {
+    "network": "https://rpc-mumbai.maticvigil.com",
+    "contract": {
+      "address": "0x30e4b13b99780d51dfc6156e639f97e602c330b0",
+      "abi": [
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "token",
+              "type": "address"
+            },
+            {
+              "internalType": "address payable",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "transfer",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ]
+    }
+  },
+  "tro": {
+    "apiKey": "4dc681b0-2dc4-4a22-9e0e-ee124fc556cf",
+    "network": "https://api.shasta.trongrid.io",
+    "contract": {
+      "address": "41F73FE0593D3AC65AE060782525F354A3D6A20A7A",
+      "abi": "transfer(address,address,uint256)"
+    }
+  }
+}

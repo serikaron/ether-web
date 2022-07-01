@@ -1,0 +1,15 @@
+FROM amd64/node:16
+
+ENV NODE_ENV=production
+
+WORKDIR /src
+
+COPY ["package.json", "package-lock.json*", "./"]
+
+RUN chown -R node:node /src
+
+USER node
+
+RUN npm install --production
+
+COPY --chown=node:node . .
