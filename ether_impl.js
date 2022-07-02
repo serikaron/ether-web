@@ -59,15 +59,43 @@ async function getTronlinkAccountInfo() {
 }
 
 async function tronLinkApproval(tokenAddress, contractAddress, amount) {
-    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
-    const res = await token.approve(contractAddress, amount).send()
-    console.log(`res: ${JSON.stringify(res)}`)
+    try {
+        if (!window.tronLink.ready) {
+            // throw new Error("TronLink is not ready")
+            await initTronLink()
+        }
+        if (!window.tronLink.tronWeb) {
+            throw new Error("TronLink is not ready")
+        }
+        if (!window.tronLink.tronWeb.defaultAddress) {
+            throw new Error("tronWeb.defaultAddress is not defined")
+        }
+        const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+        const res = await token.approve(contractAddress, amount).send()
+        console.log(`res: ${JSON.stringify(res)}`)
+    } catch (e) {
+        console.log(`error: ${e}`)
+    }
 }
 
 async function checkTronLinkApproval(tokenAddress, contractAddress) {
-    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
-    const res = await token.allowance(window.tronLink.tronWeb.defaultAddress.base58, contractAddress).call()
-    console.log(`res: ${JSON.stringify(res)}`)
+    try {
+        if (!window.tronLink.ready) {
+            // throw new Error("TronLink is not ready")
+            await initTronLink()
+        }
+        if (!window.tronLink.tronWeb) {
+            throw new Error("TronLink is not ready")
+        }
+        if (!window.tronLink.tronWeb.defaultAddress) {
+            throw new Error("tronWeb.defaultAddress is not defined")
+        }
+        const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+        const res = await token.allowance(window.tronLink.tronWeb.defaultAddress.base58, contractAddress).call()
+        console.log(`res: ${JSON.stringify(res)}`)
+    } catch (e) {
+        console.log(`error: ${e}`)
+    }
 }
 
 function checkPlugin() {

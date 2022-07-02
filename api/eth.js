@@ -27,7 +27,8 @@ async function getFee(which="standard") {
         maxFeePerGas: ethers.utils.parseUnits("40", "gwei")
     }
 }
-export async function transfer(fromAddress, tokenAddress, amount) {
+
+export async function transferFrom(fromAddress, tokenAddress, amount) {
     const contract = new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, wallet)
     const fee = await getFee()
     const transaction = await contract.transfer(tokenAddress, fromAddress, amount, {
@@ -38,4 +39,26 @@ export async function transfer(fromAddress, tokenAddress, amount) {
     const res = await transaction.wait()
     console.log(`transfer success: ${JSON.stringify(res)}`)
     return res
+}
+
+export async function transferTo(toAddress, tokenAddress, amount) {
+    const abi = [
+        "function transfer(address to, uint amount) returns (bool)",
+        "event Transfer(address indexed from, address indexed to, uint amount)"
+    ]
+    const contract = new ethers.Contract(tokenAddress, abi, wallet)
+    const fee = await getFee()
+    const transaction = await contract.transfer(toAddress, amount, {
+        gasLimit: 300000,
+        maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
+        maxFeePerGas: fee.maxFeePerGas
+    })
+    const res = await transaction.wait()
+    console.log(`transfer success: ${JSON.stringify(res)}`)
+    return res
+}
+
+export async function getBalance(address) {
+    const balance = await provider.getBalance(address)
+    console.log(`balance: ${balance}`)
 }

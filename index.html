@@ -18,12 +18,12 @@
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
         async function approve() {
-            // const response = await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9", 10)
-            const response = await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0", 10)
+            const response = await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9", 10)
+            // const response = await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0", 10)
         }
         async function check() {
-            // const response = await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9")
-            const response = await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0")
+            const response = await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9")
+            // const response = await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0")
         }
     </script>
     <script type="application/javascript">
