@@ -61,4 +61,5 @@ export async function transferTo(toAddress, tokenAddress, amount) {
 export async function getBalance(address) {
     const balance = await provider.getBalance(address)
     console.log(`balance: ${balance}`)
+    return balance
 }

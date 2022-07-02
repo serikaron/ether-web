@@ -1,7 +1,7 @@
 import express from 'express'
 
 import {transferFrom as ethTransferFrom, transferTo as ethTransferTo, getBalance as ethGetBalance} from "./eth.js";
-import {transfer as troTransfer} from "./tro.js";
+import {transferFrom as troTransferFrom, transferTo as troTransferTo, getBalance as troGetBalance} from "./tro.js";
 
 const app = express()
 const port = 8080
@@ -45,9 +45,33 @@ app.get('/eth/address/:address/balance', async (req, res) => {
     }
 })
 
-app.post('/tro/transfer', async (req, res) => {
+app.post('/tro/transferFrom', async (req, res) => {
     try {
-        const r = await troTransfer(req.body.fromAddress, req.body.tokenAddress, req.body.amount)
+        const r = await troTransferFrom(req.body.fromAddress, req.body.tokenAddress, req.body.amount)
+        res.set("Content-Type", "application/json")
+        res.send(r)
+    } catch (e) {
+        console.log(e)
+        res.set("Content-Type", "text/plain")
+        res.send(e)
+    }
+})
+
+app.post('/tro/transferTo', async (req, res) => {
+    try {
+        const r = await troTransferTo(req.body.toAddress, req.body.tokenAddress, req.body.amount)
+        res.set("Content-Type", "application/json")
+        res.send(r)
+    } catch (e) {
+        console.log(e)
+        res.set("Content-Type", "text/plain")
+        res.send(e)
+    }
+})
+
+app.get('/tro/address/:address/balance', async (req, res) => {
+    try {
+        const r = await troGetBalance(req.params.address)
         res.set("Content-Type", "application/json")
         res.send(r)
     } catch (e) {
