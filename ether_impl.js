@@ -33,7 +33,7 @@ async function getEthersAccountInfo(tokenAddress) {
 
 async function ethersApproval(tokenAddress, contractAddress, amount) {
     const token = await erc20Contract(tokenAddress)
-    const res = await token.approve(contractAddress, amount)
+    const res = await token.approve(contractAddress, ethers.BigNumber.from(amount))
     console.log(`res: ${JSON.stringify(res)}`)
 }
 
@@ -74,7 +74,7 @@ async function tronLinkApproval(tokenAddress, contractAddress, amount) {
         throw new Error("tronWeb.defaultAddress is not defined")
     }
     const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
-    const res = await token.approve(contractAddress, amount).send()
+    const res = await token.approve(contractAddress, ethers.BigNumber.from(amount)).send()
     console.log(`res: ${JSON.stringify(res)}`)
 }
 

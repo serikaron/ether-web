@@ -12,18 +12,22 @@
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
-        async function connectTronlink() {
+        async function approveEthers() {
+            const response = await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+        }
+        async function checkEthers() {
+            const response = await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0")
+        }
+        async function connectTronLink() {
             const response = await getTronlinkAccountInfo("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK")
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
-        async function approve() {
-            const response = await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9", 10)
-            // const response = await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0", 10)
+        async function approveTronLink() {
+            const response = await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
         }
-        async function check() {
+        async function checkTronLink() {
             const response = await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TYWYReZub3uMRPro41AkJ1rAqLmWSiLgH9")
-            // const response = await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x30e4b13b99780d51dfc6156e639f97e602c330b0")
         }
     </script>
     <script type="application/javascript">
@@ -37,9 +41,11 @@
 <p id="balance">Balance: n/a</p>
 <p>ethers</p>
 <button onclick="connectEthers()">Connect Ethers</button>
+<button onclick="approveEthers()">Approve</button>
+<button onclick="checkEthers()">Check</button>
 <p>TronLink</p>
-<button onclick="connectTronlink()">Connect Tronlink</button>
-<button onclick="approve()">Approve</button>
-<button onclick="check()">Check</button>
+<button onclick="connectTronLink()">Connect Tronlink</button>
+<button onclick="approveTronLink()">Approve</button>
+<button onclick="checkTronLink()">Check</button>
 </body>
 </html>
