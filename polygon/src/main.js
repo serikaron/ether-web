@@ -6,7 +6,7 @@ import agentConfig from "../artifacts/contracts/contract.sol/Agent.json" assert 
 
 const sttContractAddress = "0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b"
 const agentContractAddress = "0x30e4b13b99780d51dfc6156e639f97e602c330b0"
-const privateKey = ""
+const privateKey = "7a84baf1fd2aa0b4ef03dd86ece08299341ab91ebad13fcb66fd553484261ddf"
 const network = "https://rpc-mumbai.maticvigil.com"
 
 const provider = ethers.getDefaultProvider(network)

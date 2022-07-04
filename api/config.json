@@ -1,6 +1,7 @@
 {
   "eth": {
     "network": "https://rpc-mumbai.maticvigil.com",
+    "privateKey": "7a84baf1fd2aa0b4ef03dd86ece08299341ab91ebad13fcb66fd553484261ddf",
     "contract": {
       "address": "0x30e4b13b99780d51dfc6156e639f97e602c330b0",
       "abi": [
@@ -38,6 +39,7 @@
   "tro": {
     "apiKey": "4dc681b0-2dc4-4a22-9e0e-ee124fc556cf",
     "network": "https://api.shasta.trongrid.io",
+    "privateKey": "dc876bd08ce7220975aee160c21884637cdeaebab488db5efe48dd23bc2a2235",
     "contract": {
       "address": "41F73FE0593D3AC65AE060782525F354A3D6A20A7A",
       "abi": "transfer(address,address,uint256)"

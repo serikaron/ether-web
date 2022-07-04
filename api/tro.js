@@ -30,8 +30,9 @@ export async function transferTo(toAddress, tokenAddress, amount) {
     return transferResult
 }
 
-export async function getBalance(address) {
-    const balance = await tronWeb.trx.getBalance(address)
-    console.log(`getBalance: ${balance}`)
-    return {balance}
+export async function getBalance(tokenAddress, address) {
+    const contract = await tronWeb.contract().at(tokenAddress)
+    const balance = await contract.balanceOf(address).call()
+    console.log(`getBalance: ${balance.toString()}`)
+    return {balance: balance.toString()}
 }

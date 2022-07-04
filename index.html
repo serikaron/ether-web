@@ -8,12 +8,12 @@
             type="application/javascript"></script>
     <script type="application/javascript">
         async function connectEthers() {
-            const response = await getEthersAccountInfo(window.ethereum)
+            const response = await getEthersAccountInfo("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b")
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
         async function connectTronlink() {
-            const response = await getTronlinkAccountInfo()
+            const response = await getTronlinkAccountInfo("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK")
             document.getElementById("account").innerText = `Account: ${response.address}`
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
@@ -35,7 +35,9 @@
 <body>
 <p id="account">Account: n/a</p>
 <p id="balance">Balance: n/a</p>
+<p>ethers</p>
 <button onclick="connectEthers()">Connect Ethers</button>
+<p>TronLink</p>
 <button onclick="connectTronlink()">Connect Tronlink</button>
 <button onclick="approve()">Approve</button>
 <button onclick="check()">Check</button>

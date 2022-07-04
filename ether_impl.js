@@ -1,25 +1,11 @@
 "use strict";
 
-async function getEthersAccountInfo(ethereum) {
-    console.log("Getting ethers account info");
-    if (typeof ethereum === 'undefined') {
-        throw new Error("Ethereum is not ready")
-    }
-    const provider = new ethers.providers.Web3Provider(ethereum)
-    await provider.send("eth_requestAccounts", [])
-    const signer = provider.getSigner()
-
-    const address = await signer.getAddress()
-    const balance = await signer.getBalance()
-    console.log(`address: ${address}, balcance: ${balance.toString()}`)
-    return {address, balance: balance.toString()}
-}
-
 async function erc20Contract(tokenAddress) {
     const abi = [
         "function allowance(address owner, address spender) view returns (uint256)",
         "function approve(address spender, uint256 amount) returns (bool)",
-        "event Approval(address indexed owner, address indexed spender, uint256 value)"
+        "event Approval(address indexed owner, address indexed spender, uint256 value)",
+        "function balanceOf(address owner) view returns (uint256)"
     ];
 
     // console.log(window.ethereum)
@@ -27,6 +13,22 @@ async function erc20Contract(tokenAddress) {
     await provider.send("eth_requestAccounts", [])
     const signer = provider.getSigner()
     return new ethers.Contract(tokenAddress, abi, signer)
+}
+
+async function getEthersAccountInfo(tokenAddress) {
+    console.log("Getting ethers account info");
+    if (typeof window.ethereum === 'undefined') {
+        throw new Error("Ethereum is not ready")
+    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    await provider.send("eth_requestAccounts", [])
+    const signer = provider.getSigner()
+
+    const address = await signer.getAddress()
+    const token = await erc20Contract(tokenAddress)
+    const balance = await token.balanceOf(address)
+    console.log(`address: ${address}, balcance: ${balance.toString()}`)
+    return {address, balance: balance.toString()}
 }
 
 async function ethersApproval(tokenAddress, contractAddress, amount) {
@@ -42,7 +44,7 @@ async function checkEthersApproval(tokenAddress, contractAddress) {
     return res.toString()
 }
 
-async function getTronlinkAccountInfo() {
+async function getTronlinkAccountInfo(tokenAddress) {
     if (!window.tronLink.ready) {
         // throw new Error("TronLink is not ready")
         await initTronLink()
@@ -54,7 +56,8 @@ async function getTronlinkAccountInfo() {
         throw new Error("tronWeb.defaultAddress is not defined")
     }
     const address = await window.tronLink.tronWeb.defaultAddress.base58
-    const balance = await window.tronLink.tronWeb.trx.getBalance(address)
+    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+    const balance = await token.balanceOf(address).call()
     console.log(`address: ${address}, balance: ${balance}`)
     return {address, balance}
 }

@@ -58,8 +58,12 @@ export async function transferTo(toAddress, tokenAddress, amount) {
     return res
 }
 
-export async function getBalance(address) {
-    const balance = await provider.getBalance(address)
-    console.log(`balance: ${balance}`)
-    return balance
+export async function getBalance(tokenAddress, address) {
+    const abi = [
+        "function balanceOf(address owner) view returns (uint256)"
+    ]
+    const token = new ethers.Contract(tokenAddress, abi, provider)
+    const balance = await token.balanceOf(address)
+    console.log(`balance: ${balance.toString()}`)
+    return {balance: balance.toString()}
 }
