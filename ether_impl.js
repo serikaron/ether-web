@@ -38,7 +38,8 @@ async function ethersApproval(tokenAddress, contractAddress, amount) {
 async function checkEthersApproval(tokenAddress, contractAddress) {
     const token = await erc20Contract(tokenAddress)
     const res = await token.allowance(window.ethereum.selectedAddress, contractAddress)
-    console.log(`res: ${JSON.stringify(res)}`)
+    console.log(`res: ${res.toString()}`)
+    return res.toString()
 }
 
 async function getTronlinkAccountInfo() {
@@ -87,7 +88,8 @@ async function checkTronLinkApproval(tokenAddress, contractAddress) {
     }
     const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
     const res = await token.allowance(window.tronLink.tronWeb.defaultAddress.base58, contractAddress).call()
-    console.log(`res: ${JSON.stringify(res)}`)
+    console.log(`res: ${res.toString()}`)
+    return res.toString()
 }
 
 function checkPlugin() {
