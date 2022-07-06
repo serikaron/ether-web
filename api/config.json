@@ -41,7 +41,7 @@
     "network": "https://api.shasta.trongrid.io",
     "privateKey": "dc876bd08ce7220975aee160c21884637cdeaebab488db5efe48dd23bc2a2235",
     "contract": {
-      "address": "41F73FE0593D3AC65AE060782525F354A3D6A20A7A",
+      "address": "41158A5D8CA9C52DA600B0D692103C3D753B0AE5BE",
       "abi": "transfer(address,address,uint256)"
     }
   }
