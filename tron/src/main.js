@@ -8,7 +8,7 @@ const API_HOST = "https://api.shasta.trongrid.io"
 const TOKEN_ADDRESS = "TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK";
 // const FROM_ADDRESS = "TDBfA84hsCaX84KEkXmnodDgVNpkAryMU1";
 
-const privateKey = "dc876bd08ce7220975aee160c21884637cdeaebab488db5efe48dd23bc2a2235"
+const privateKey = ""
 const apiKey = "4dc681b0-2dc4-4a22-9e0e-ee124fc556cf"
 
 const tronWeb = new TronWeb({

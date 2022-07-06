@@ -1,16 +1,16 @@
 import express from 'express'
 
-import {transferFrom as ethTransferFrom, transferTo as ethTransferTo, getBalance as ethGetBalance} from "./eth.js";
-import {transferFrom as troTransferFrom, transferTo as troTransferTo, getBalance as troGetBalance} from "./tro.js";
+import {transferToPlatform as ethTransferToPlatform, transferToUser as ethTransferToUser, getBalance as ethGetBalance} from "./eth.js";
+import {transferToPlatform as troTransferToPlatform, transferToUser as troTransferToUser, getBalance as troGetBalance} from "./tro.js";
 
 const app = express()
 const port = 8080
 
 app.use(express.json())
 
-app.post('/eth/transferFrom', async (req, res) => {
+app.post('/eth/transferToPlatform', async (req, res) => {
     try {
-        const r = await ethTransferFrom(req.body.fromAddress, req.body.tokenAddress, req.body.amount)
+        const r = await ethTransferToPlatform(req.body.userAddress, req.body.tokenAddress, req.body.amount)
         res.set("Content-Type", "application/json")
         res.send(r)
     } catch (e) {
@@ -20,9 +20,9 @@ app.post('/eth/transferFrom', async (req, res) => {
     }
 })
 
-app.post('/eth/transferTo', async (req, res) => {
+app.post('/eth/transferToUser', async (req, res) => {
     try {
-        const r = await ethTransferTo(req.body.toAddress, req.body.tokenAddress, req.body.amount)
+        const r = await ethTransferToUser(req.body.userAddress, req.body.tokenAddress, req.body.amount)
         res.set("Content-Type", "application/json")
         res.send(r)
     } catch (e) {
@@ -44,9 +44,9 @@ app.get('/eth/token/:token/address/:address/balance', async (req, res) => {
     }
 })
 
-app.post('/tro/transferFrom', async (req, res) => {
+app.post('/tro/transferToPlatform', async (req, res) => {
     try {
-        const r = await troTransferFrom(req.body.fromAddress, req.body.tokenAddress, req.body.amount)
+        const r = await troTransferToPlatform(req.body.userAddress, req.body.tokenAddress, req.body.amount)
         res.set("Content-Type", "application/json")
         res.send(r)
     } catch (e) {
@@ -56,9 +56,9 @@ app.post('/tro/transferFrom', async (req, res) => {
     }
 })
 
-app.post('/tro/transferTo', async (req, res) => {
+app.post('/tro/transferToUser', async (req, res) => {
     try {
-        const r = await troTransferTo(req.body.toAddress, req.body.tokenAddress, req.body.amount)
+        const r = await troTransferToUser(req.body.userAddress, req.body.tokenAddress, req.body.amount)
         res.set("Content-Type", "application/json")
         res.send(r)
     } catch (e) {
