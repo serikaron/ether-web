@@ -50,16 +50,30 @@ async function getTronlinkAccountInfo(tokenAddress) {
         await initTronLink()
     }
     if (!window.tronLink.tronWeb) {
-        throw new Error("TronLink is not ready")
+        return {code: -1, msg: `TronLink is not ready`, data: {}}
     }
     if (!window.tronLink.tronWeb.defaultAddress) {
-        throw new Error("tronWeb.defaultAddress is not defined")
+        return {code: -2, msg: `tronWeb.defaultAddress is not defined`, data: {}}
     }
-    const address = await window.tronLink.tronWeb.defaultAddress.base58
-    const token = await window.tronLink.tronWeb.contract().at(tokenAddress)
-    const balance = await token.balanceOf(address).call()
-    console.log(`address: ${address}, balance: ${balance}`)
-    return {address, balance}
+    let address
+    let token
+    try {
+        address = await window.tronLink.tronWeb.defaultAddress.base58
+    } catch (e) {
+        return {code: -3, msg: `tronWeb.defaultAddress is not defined`, data: {}}
+    }
+    try {
+        token = await window.tronLink.tronWeb.contract().at(tokenAddress)
+    } catch (e) {
+        return {code: -4, msg: `tokenAddress(${tokenAddress}) invalid`, data: {}}
+    }
+    try {
+        const balance = await token.balanceOf(address).call()
+        console.log(`address: ${address}, balance: ${balance}`)
+        return {code: 0, msg: "", data: {address, balance}}
+    } catch (e) {
+        return {code: -5, msg: `${e}`, data: {}}
+    }
 }
 
 async function tronLinkApproval(tokenAddress, contractAddress, amount) {

