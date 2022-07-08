@@ -10,7 +10,9 @@ import {
 import {
     transferToPlatform as troTransferToPlatform,
     transferToUser as troTransferToUser,
-    getBalance as troGetBalance
+    getBalance as troGetBalance,
+    getOwner as troGetOwner,
+    setOwner as troSetOwner,
 } from "./tro.js";
 
 const app = express()
@@ -61,39 +63,33 @@ app.get('/eth/owner', async (req, res) => {
 })
 
 app.post('/tro/transferToPlatform', async (req, res) => {
-    try {
-        const r = await troTransferToPlatform(req.body.userAddress, req.body.tokenAddress, req.body.amount)
-        res.set("Content-Type", "application/json")
-        res.send(r)
-    } catch (e) {
-        console.log(e)
-        res.set("Content-Type", "text/plain")
-        res.send(e)
-    }
+    run(res, async () => {
+        return await troTransferToPlatform(req.body.userAddress, req.body.platformAddress, req.body.tokenAddress, req.body.amount)
+    })
 })
 
 app.post('/tro/transferToUser', async (req, res) => {
-    try {
-        const r = await troTransferToUser(req.body.userAddress, req.body.tokenAddress, req.body.amount)
-        res.set("Content-Type", "application/json")
-        res.send(r)
-    } catch (e) {
-        console.log(e)
-        res.set("Content-Type", "text/plain")
-        res.send(e)
-    }
+    run(res, async () => {
+        return await troTransferToUser(req.body.userAddress, req.body.tokenAddress, req.body.amount)
+    })
 })
 
 app.get('/tro/token/:token/address/:address/balance', async (req, res) => {
-    try {
-        const r = await troGetBalance(req.params.token, req.params.address)
-        res.set("Content-Type", "application/json")
-        res.send(r)
-    } catch (e) {
-        console.log(e)
-        res.set("Content-Type", "text/plain")
-        res.send(e)
-    }
+    run(res, async () => {
+        return await troGetBalance(req.params.token, req.params.address)
+    })
+})
+
+app.get('/tro/owner', async (req, res) => {
+    run(res, async () => {
+        return await troGetOwner()
+    })
+})
+
+app.post('/tro/owner', async (req, res) => {
+    run(res, async () => {
+        return await troSetOwner(req.body.owner)
+    })
 })
 
 app.listen(port, () => {
