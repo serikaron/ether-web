@@ -25,7 +25,7 @@ async function main() {
   // `)
 
     const Agent = await hre.ethers.getContractFactory("Agent");
-    const agent = await Agent.deploy("0xEF9083f7d3C995Fc95f9F296b1A30E7BdeD2206D");
+    const agent = await Agent.deploy();
     await agent.deployed();
     console.log("Agent deployed to:", agent.address);
     fs.writeFileSync('./agent-contract.js', `

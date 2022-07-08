@@ -1,5 +1,6 @@
 import TronWeb from 'tronweb';
 import config from "./config.json" assert {type: "json"}
+import {ethers} from "ethers";
 
 const tronWeb = new TronWeb({
     fullHost: config.tro.network,
@@ -43,8 +44,10 @@ export async function getBalance(tokenAddress, address) {
     try {
         const contract = await tronWeb.contract().at(tokenAddress)
         const balance = await contract.balanceOf(address).call()
-        console.log(`getBalance: ${balance.toString()}`)
-        return {code: 0, msg: "", data:{balance: balance.toString()}}
+        const decimals = await contract.decimals().call()
+        const balanceFormatted = ethers.utils.formatUnits(balance, decimals)
+        console.log(`getBalance: ${balance.toString()} ${balanceFormatted}`)
+        return {code: 0, msg: "", data:{balance: balanceFormatted}}
     } catch (e) {
         console.log(`getBalance: ${e}`)
         return {code: -1, msg: `${e}`}

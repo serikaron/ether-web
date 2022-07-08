@@ -7,6 +7,10 @@ import config from "./config.json" assert {type: "json"}
 const provider = ethers.getDefaultProvider(config.eth.network)
 const wallet = new ethers.Wallet(config.eth.privateKey, provider)
 
+function contract() {
+    return new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, wallet)
+}
+
 async function getFee(which="standard") {
     let retry = 3
     while (retry > 0) {
@@ -28,11 +32,10 @@ async function getFee(which="standard") {
     }
 }
 
-export async function transferToPlatform(userAddress, tokenAddress, amount) {
+export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
     try {
-        const contract = new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, wallet)
         const fee = await getFee()
-        const transaction = await contract.transfer(tokenAddress, userAddress, amount, {
+        const transaction = await contract().transfer(tokenAddress, userAddress, platformAddress, amount, {
             gasLimit: 300000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
@@ -71,14 +74,48 @@ export async function transferToUser(userAddress, tokenAddress, amount) {
 export async function getBalance(tokenAddress, address) {
     try {
         const abi = [
-            "function balanceOf(address owner) view returns (uint256)"
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)"
         ]
         const token = new ethers.Contract(tokenAddress, abi, provider)
         const balance = await token.balanceOf(address)
-        console.log(`balance: ${balance.toString()}`)
-        return {code: 0, msg: "", data: {balance: balance.toString()}}
+        const decimals = await token.decimals()
+        const balanceFormatted = ethers.utils.formatUnits(balance, decimals)
+        console.log(`balance: ${balance.toString()} ${balanceFormatted}`)
+        return {code: 0, msg: "", data: {balance: balanceFormatted}}
     } catch (e) {
         console.log(`get balance failed: ${e}`)
+        return {code: -1, msg: `${e}`}
+    }
+}
+
+export async function getOwner() {
+    try {
+        const owner = await contract().getOwner()
+        return {code: 0, msg: "", data:{owner}}
+    } catch (e) {
+        console.log(`get owner failed: ${e}`)
+        return {code: -1, msg: `${e}`}
+    }
+}
+
+export async function setOwner(newOwner) {
+    try {
+        const isAddress = ethers.utils.isAddress(newOwner)
+        if (!isAddress) {
+            return {code: -100, msg: "new owner is not a valid address"}
+        }
+        const fee = await getFee()
+        const transaction = await contract().setOwner(newOwner, {
+            gasLimit: 300000,
+            maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
+            maxFeePerGas: fee.maxFeePerGas
+        })
+        const res = await transaction.wait()
+        console.log(`set owner(${newOwner}) success: ${JSON.stringify(res)}`)
+        return {code: 0, msg: "", data: {txId: res.transactionHash, newOwner}}
+    } catch (e) {
+        console.log(`set owner failed: ${e}`)
         return {code: -1, msg: `${e}`}
     }
 }

