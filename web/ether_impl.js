@@ -5,7 +5,8 @@ async function erc20Contract(tokenAddress) {
         "function allowance(address owner, address spender) view returns (uint256)",
         "function approve(address spender, uint256 amount) returns (bool)",
         "event Approval(address indexed owner, address indexed spender, uint256 value)",
-        "function balanceOf(address owner) view returns (uint256)"
+        "function balanceOf(address owner) view returns (uint256)",
+        "function decimals() view returns (uint8)",
     ];
 
     // console.log(window.ethereum)
@@ -27,8 +28,9 @@ async function getEthersAccountInfo(tokenAddress) {
     const address = await signer.getAddress()
     const token = await erc20Contract(tokenAddress)
     const balance = await token.balanceOf(address)
-    console.log(`address: ${address}, balcance: ${balance.toString()}`)
-    return {address, balance: balance.toString()}
+    const decimals = await token.decimals()
+    const balanceParsed = ethers.utils.formatUnits(balance.toString(), decimals.toString())
+    return {address, balance: balanceParsed}
 }
 
 async function ethersApproval(tokenAddress, contractAddress, amount) {
@@ -69,8 +71,10 @@ async function getTronlinkAccountInfo(tokenAddress) {
     }
     try {
         const balance = await token.balanceOf(address).call()
-        console.log(`address: ${address}, balance: ${balance}`)
-        return {code: 0, msg: "", data: {address, balance}}
+        const decimals = await token.decimals().call()
+        const balanceParsed = ethers.utils.formatUnits(balance.toString(), decimals.toString())
+        console.log(`address: ${address}, balance: ${balance}, decimals: ${decimals}, balanceParsed: ${balanceParsed}`)
+        return {code: 0, msg: "", data: {address, balance: balanceParsed}}
     } catch (e) {
         return {code: -5, msg: `${e}`, data: {}}
     }
