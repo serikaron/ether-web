@@ -2,11 +2,28 @@ import TronWeb from 'tronweb';
 import config from "./config.json" assert {type: "json"}
 import {ethers} from "ethers";
 
-const tronWeb = new TronWeb({
-    fullHost: config.tro.network,
-    privateKey: config.tro.privateKey,
-    headers: {"TRON-PRO-API-KEY": config.tro.apiKey},
-})
+// const tronWeb = new TronWeb({
+//     fullHost: config.tro.network,
+//     privateKey: config.tro.privateKey,
+//     headers: {"TRON-PRO-API-KEY": config.tro.apiKey},
+// })
+
+function tronWeb(privateKey) {
+    return new TronWeb({
+        fullHost: config.tro.network,
+        privateKey: privateKey,
+        headers: {"TRON-PRO-API-KEY": config.tro.apiKey},
+    })
+}
+
+async function agentContract() {
+    console.log(`agentContract, address:${config.tro.agentAddress}`)
+    return await tronWeb(config.tro.contractOwner).contract().at(config.tro.contract.address)
+}
+
+async function tokenContract(tokenAddress) {
+    return await tronWeb(config.tro.payAccount).contract().at(tokenAddress)
+}
 
 export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
     try {
@@ -23,7 +40,7 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
         // const receipt = await tronWeb.trx.sendRawTransaction(signedTxn)
         // console.log(`transferToPlatform: ${JSON.stringify(receipt)}`)
         // const txId = receipt.txid
-        const contract = await tronWeb.contract().at(config.tro.contract.address)
+        const contract = await agentContract()
         const txId = await contract.transfer(tokenAddress, userAddress, platformAddress, amount).send()
         return {code: 0, msg: "", data: {txId}}
     } catch (e) {
@@ -34,7 +51,7 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
 
 export async function transferToUser(userAddress, tokenAddress, amount) {
     try {
-        const contract = await tronWeb.contract().at(tokenAddress)
+        const contract = await tokenContract(tokenAddress)
         const transferResult = await contract.transfer(userAddress, amount).send()
         console.log(`transferToUser: ${transferResult}`)
         return {code: 0, msg: "", data: {txId: transferResult}}
@@ -46,7 +63,7 @@ export async function transferToUser(userAddress, tokenAddress, amount) {
 
 export async function getBalance(tokenAddress, address) {
     try {
-        const contract = await tronWeb.contract().at(tokenAddress)
+        const contract = await tokenContract(tokenAddress)
         const balance = await contract.balanceOf(address).call()
         const decimals = await contract.decimals().call()
         const balanceFormatted = ethers.utils.formatUnits(balance, decimals)
@@ -60,9 +77,9 @@ export async function getBalance(tokenAddress, address) {
 
 export async function getOwner() {
     try {
-        const contract = await tronWeb.contract().at(config.tro.contract.address)
+        const contract = await agentContract()
         const ownerHex = await contract.getOwner().call()
-        const owner = tronWeb.address.fromHex(ownerHex)
+        const owner = tronWeb(config.tro.contractOwner).address.fromHex(ownerHex)
         console.log(`getOwner: ${owner}`)
         return {code: 0, msg: "", data:{owner}}
     } catch (e) {
@@ -73,11 +90,11 @@ export async function getOwner() {
 
 export async function setOwner(newOwner) {
     try {
-        const isAddress = tronWeb.isAddress(newOwner)
+        const isAddress = tronWeb(config.tro.contractOwner).isAddress(newOwner)
         if (!isAddress) {
             return {code: -100, msg: `${newOwner} is not a valid address`}
         }
-        const contract = await tronWeb.contract().at(config.tro.contract.address)
+        const contract = await agentContract()
         const txId = await contract.setOwner(newOwner).send()
         console.log(`setOwner${newOwner} success, tdId: ${txId}`)
         return {code: 0, msg: "", data:{newOwner, txId}}

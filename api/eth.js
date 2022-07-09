@@ -5,10 +5,11 @@ import {ethers} from "ethers"
 import config from "./config.json" assert {type: "json"}
 
 const provider = ethers.getDefaultProvider(config.eth.network)
-const wallet = new ethers.Wallet(config.eth.privateKey, provider)
+const wallet = new ethers.Wallet(config.eth.payAccount, provider)
 
 function contract() {
-    return new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, wallet)
+    const owner = new ethers.Wallet(config.eth.contractOwner, provider)
+    return new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, owner)
 }
 
 async function getFee(which="standard") {
