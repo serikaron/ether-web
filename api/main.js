@@ -6,6 +6,7 @@ import {
     getBalance as ethGetBalance,
     getOwner as ethGetOwner,
     setOwner as ethSetOwner,
+    allowance as ethAllowance,
 } from "./eth.js";
 import {
     transferToPlatform as troTransferToPlatform,
@@ -59,6 +60,12 @@ app.post('/eth/owner', async (req, res) => {
 app.get('/eth/owner', async (req, res) => {
     run(res, async () => {
         return await ethGetOwner()
+    })
+})
+
+app.get('/eth/token/:token/address/:address/allowance', async (req, res) => {
+    run(res, async () => {
+        return await ethAllowance(req.params.token, req.params.address)
     })
 })
 

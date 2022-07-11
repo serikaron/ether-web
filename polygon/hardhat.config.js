@@ -35,13 +35,27 @@ module.exports = {
         mainnet: {
             url: "https://eth-mainnet.g.alchemy.com/v2/szmfNjVkkc3VWdLfM7Dv4a4OSd7rVlar",
             accounts: [process.env.privateKey]
+        },
+        goerli: {
+            url: "https://eth-goerli.alchemyapi.io/v2/szmfNjVkkc3VWdLfM7Dv4a4OSd7rVlar",
+            accounts: [process.env.privateKey]
         }
     },
     etherscan: {
-        url: "https://api.etherscan.io",
+        url: "https://api-goerli.etherscan.io",
         apiKey: {
-            mainnet: "K2VAWA4T3UC1CNY8AUK1NSYA4MA4AVHIK1"
+            mainnet: "K2VAWA4T3UC1CNY8AUK1NSYA4MA4AVHIK1",
+            goerli: "K2VAWA4T3UC1CNY8AUK1NSYA4MA4AVHIK1"
         }
     },
-    solidity: "0.8.4"
+    solidity: {
+        compilers: [
+            {
+                version: "0.4.17"
+            },
+            {
+                version: "0.8.0"
+            }
+        ]
+    }
 };

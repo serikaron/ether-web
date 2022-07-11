@@ -16,14 +16,6 @@ async function main() {
 
     // We get the contract to deploy
 
-  //   const STTToken = await hre.ethers.getContractFactory("STTToken");
-  //   const sttToken = await STTToken.deploy(1000000);
-  //   await sttToken.deployed();
-  //   console.log("STT deployed to:", sttToken.address);
-  //   fs.writeFileSync('./stt-contract.js', `
-  // export const marketplaceAddress = "${sttToken.address}"
-  // `)
-
     const Agent = await hre.ethers.getContractFactory("Agent");
     const agent = await Agent.deploy();
     await agent.deployed();

@@ -10,7 +10,5 @@ app.get("/", function(req, res){
 
 const port = 5000
 app.listen(port, () => {
-    const s = "0"
-    console.log(`JSON.parse(s) = ${JSON.parse(s)}`)
     console.log(`listening on port ${port}`)
 })

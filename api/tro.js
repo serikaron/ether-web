@@ -25,23 +25,17 @@ async function tokenContract(tokenAddress) {
     return await tronWeb(config.tro.payAccount).contract().at(tokenAddress)
 }
 
+async function parseToken(tokenAddress, amount) {
+    const token = await tokenContract(tokenAddress)
+    const decimals = await token.decimals().call()
+    return ethers.utils.parseUnits(amount.toString(), decimals.toString())
+}
+
 export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
     try {
-        // const parameters = [
-        //     {type: 'address', value: tokenAddress},
-        //     {type: 'address', value: userAddress},
-        //     {type: 'address', value: platformAddress},
-        //     {type: 'uint256', value: amount}
-        // ]
-        // const address = tronWeb.address.toHex(tronWeb.address.fromPrivateKey(config.tro.privateKey));
-        // const transRes = await tronWeb.transactionBuilder.triggerSmartContract(config.tro.contract.address, config.tro.contract.abi, {}, parameters, address);
-        // const transaction = transRes.transaction
-        // const signedTxn = await tronWeb.trx.sign(transaction, config.tro.privateKey)
-        // const receipt = await tronWeb.trx.sendRawTransaction(signedTxn)
-        // console.log(`transferToPlatform: ${JSON.stringify(receipt)}`)
-        // const txId = receipt.txid
+        const parsedAmount = await parseToken(tokenAddress, amount)
         const contract = await agentContract()
-        const txId = await contract.transfer(tokenAddress, userAddress, platformAddress, amount).send()
+        const txId = await contract.transfer(tokenAddress, userAddress, platformAddress, parsedAmount).send()
         return {code: 0, msg: "", data: {txId}}
     } catch (e) {
         console.log(`transferToPlatform: ${e}`)
@@ -51,8 +45,9 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
 
 export async function transferToUser(userAddress, tokenAddress, amount) {
     try {
+        const parsedAmount = await parseToken(tokenAddress, amount)
         const contract = await tokenContract(tokenAddress)
-        const transferResult = await contract.transfer(userAddress, amount).send()
+        const transferResult = await contract.transfer(userAddress, parsedAmount).send()
         console.log(`transferToUser: ${transferResult}`)
         return {code: 0, msg: "", data: {txId: transferResult}}
     } catch (e) {
