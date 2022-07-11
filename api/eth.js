@@ -35,6 +35,10 @@ async function formatToken(tokenAddress, amount) {
     return ethers.utils.formatUnits(amount, decimals.toString())
 }
 
+async function waitForTransaction(txId) {
+    await provider.waitForTransaction(txId, 1, 1)
+}
+
 async function getFee(which = "standard") {
     let retry = 3
     while (retry > 0) {
@@ -57,7 +61,7 @@ async function getFee(which = "standard") {
 }
 
 export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
-    // try {
+    try {
         const parsedAmount = await parseToken(tokenAddress, amount)
         console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${platformAddress}`)
         const fee = await getFee()
@@ -67,12 +71,14 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
             maxFeePerGas: fee.maxFeePerGas
         })
         const res = await transaction.wait()
-        console.log(`transfer success: ${JSON.stringify(res)}`)
+        console.log(`transfer success: ${res.transactionHash}, waiting for confirmation`)
+        await waitForTransaction(res.transactionHash)
+        console.log(`transfer success: ${res.transactionHash}, confirmed`)
         return {code: 0, msg: "", data: {txId: res.transactionHash}}
-    // } catch (e) {
-    //     console.log(`transfer failed: ${e}`)
-    //     return {code: -1, msg: `${e}`}
-    // }
+    } catch (e) {
+        console.log(`transfer failed: ${e}`)
+        return {code: -1, msg: `${e}`}
+    }
 }
 
 export async function transferToUser(userAddress, tokenAddress, amount) {
