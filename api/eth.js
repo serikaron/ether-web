@@ -39,24 +39,23 @@ async function waitForTransaction(txId) {
     await provider.waitForTransaction(txId, 1, 1)
 }
 
-async function getFee(which = "standard") {
-    let retry = 3
-    while (retry > 0) {
-        try {
-            const r = await axios.get("https://gasstation-mainnet.matic.network/v2")
-            const fee = r.data[which]
-            return {
-                maxPriorityFeePerGas: ethers.BigNumber.from(Math.ceil(fee.maxPriorityFee * 2 * 1e9)),
-                maxFeePerGas: ethers.BigNumber.from(Math.ceil(fee.maxFee * 2 * 1e9)),
-            }
-        } catch (e) {
-            retry--
+async function getFee() {
+    try {
+        const r = await axios.get("https://ethgasstation.info/json/ethgasAPI.json")
+        const out = {
+            maxFeePerGas: ethers.utils.parseUnits((r.data.fast/10).toString(), "gwei"),
+            maxPriorityFeePerGas: ethers.utils.parseUnits("1", "gwei"),
         }
-    }
-
-    return {
-        maxPriorityFeePerGas: ethers.utils.parseUnits("40", "gwei"),
-        maxFeePerGas: ethers.utils.parseUnits("40", "gwei")
+        console.log(`Fee: maxFeePerGas: ${ethers.utils.formatUnits(out.maxFeePerGas, "gwei")} maxPriorityFeePerGas: ${ethers.utils.formatUnits(out.maxPriorityFeePerGas, "gwei")}`)
+        return out
+    } catch (e) {
+        const out = {
+            maxFeePerGas: ethers.utils.parseUnits("40", "gwei"),
+            maxPriorityFeePerGas: ethers.utils.parseUnits("1", "gwei"),
+        }
+        console.log(`getFee error ${e}`)
+        console.log(`getFee error use default fee: maxFeePerGas: ${ethers.utils.formatUnits(out.maxFeePerGas, "gwei")} maxPriorityFeePerGas: ${ethers.utils.formatUnits(out.maxPriorityFeePerGas, "gwei")}`)
+        return out
     }
 }
 
@@ -87,7 +86,7 @@ export async function transferToUser(userAddress, tokenAddress, amount) {
         const contract = tokenContract(tokenAddress, false)
         const fee = await getFee()
         const transaction = await contract.transfer(userAddress, parsedAmount, {
-            gasLimit: 300000,
+            gasLimit: 100000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
         })
@@ -132,7 +131,7 @@ export async function setOwner(newOwner) {
         }
         const fee = await getFee()
         const transaction = await contract().setOwner(newOwner, {
-            gasLimit: 300000,
+            gasLimit: 100000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
         })
