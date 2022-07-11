@@ -14,6 +14,7 @@ import {
     getBalance as troGetBalance,
     getOwner as troGetOwner,
     setOwner as troSetOwner,
+    allowance as troAllowance,
 } from "./tro.js";
 
 const app = express()
@@ -96,6 +97,12 @@ app.get('/tro/owner', async (req, res) => {
 app.post('/tro/owner', async (req, res) => {
     run(res, async () => {
         return await troSetOwner(req.body.owner)
+    })
+})
+
+app.get('/tro/token/:token/address/:address/allowance', async (req, res) => {
+    run(res, async () => {
+        return await troAllowance(req.params.token, req.params.address)
     })
 })
 

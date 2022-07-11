@@ -92,7 +92,9 @@ export async function transferToUser(userAddress, tokenAddress, amount) {
             maxFeePerGas: fee.maxFeePerGas
         })
         const res = await transaction.wait()
-        console.log(`transfer success: ${JSON.stringify(res)}`)
+        console.log(`transfer success: ${res.transactionHash}, waiting for confirmation`)
+        await waitForTransaction(res.transactionHash)
+        console.log(`transfer success: ${res.transactionHash}, confirmed`)
         return {code: 0, msg: "", data: {txId: res.transactionHash}}
     } catch (e) {
         console.log(`transfer failed: ${e}`)

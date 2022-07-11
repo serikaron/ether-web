@@ -42,7 +42,7 @@ module.exports = {
         }
     },
     etherscan: {
-        url: "https://api-goerli.etherscan.io",
+        url: "https://api.etherscan.io",
         apiKey: {
             mainnet: "K2VAWA4T3UC1CNY8AUK1NSYA4MA4AVHIK1",
             goerli: "K2VAWA4T3UC1CNY8AUK1NSYA4MA4AVHIK1"
