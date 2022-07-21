@@ -6,6 +6,7 @@ import config from "./config.json" assert {type: "json"}
 
 let _spenderAccount = ""
 let _payAccount = ""
+let _platformAccount = ""
 
 const provider = ethers.getDefaultProvider(config.eth.network)
 
@@ -61,15 +62,18 @@ async function getFee() {
     }
 }
 
-export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
+export async function transferToPlatform(userAddress, tokenAddress, amount) {
     try {
         if (_spenderAccount === "") {
             return {code: -100, msg: "spender account not set"}
         }
+        if (_platformAccount === "") {
+            return {code: -101, msg: "platform account not set"}
+        }
         const parsedAmount = await parseToken(tokenAddress, amount)
-        console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${platformAddress}`)
+        console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${_platformAccount}`)
         const fee = await getFee()
-        const transaction = await tokenContract(tokenAddress, _spenderAccount).transferFrom(userAddress, platformAddress, parsedAmount, {
+        const transaction = await tokenContract(tokenAddress, _spenderAccount).transferFrom(userAddress, _platformAccount, parsedAmount, {
             gasLimit: 300000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
@@ -137,8 +141,17 @@ export async function allowance(tokenAddress, userAddress) {
     }
 }
 
-export async function updateSettings(spenderAccount, payAccount) {
-    _spenderAccount = spenderAccount
-    _payAccount = payAccount
+export async function updateSettings(settings) {
+    _spenderAccount = settings.spender.privateKey
+    const spenderAddress = wallet(_spenderAccount).address
+    if (spenderAddress !== settings.spender.address) {
+        return {code: -1, msg: "spender address not match"}
+    }
+    _payAccount = settings.platformOut.privateKey
+    const payAddress = wallet(_payAccount).address
+    if (payAddress !== settings.platformOut.address) {
+        return {code: -1, msg: "pay address not match"}
+    }
+    _platformAccount = settings.platformIn.address
     return {code: 0, msg: "OK", data: {}}
 }

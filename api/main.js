@@ -34,7 +34,7 @@ async function run(res, f) {
 
 app.post('/eth/transferToPlatform', async (req, res) => {
     run(res, async () => {
-        return await ethTransferToPlatform(req.body.userAddress, req.body.platformAddress, req.body.tokenAddress, req.body.amount)
+        return await ethTransferToPlatform(req.body.userAddress, req.body.tokenAddress, req.body.amount)
     })
 })
 
@@ -58,13 +58,13 @@ app.get('/eth/token/:token/address/:address/allowance', async (req, res) => {
 
 app.post('/eth/settings', async (req, res) => {
     run(res, async () => {
-        return await ethUpdateSettings(req.body.spenderAccount, req.body.payAccount)
+        return await ethUpdateSettings(req.body)
     })
 })
 
 app.post('/tro/transferToPlatform', async (req, res) => {
     run(res, async () => {
-        return await troTransferToPlatform(req.body.userAddress, req.body.platformAddress, req.body.tokenAddress, req.body.amount)
+        return await troTransferToPlatform(req.body.userAddress, req.body.tokenAddress, req.body.amount)
     })
 })
 
@@ -88,7 +88,7 @@ app.get('/tro/token/:token/address/:address/allowance', async (req, res) => {
 
 app.post('/tro/settings', async (req, res) => {
     run(res, async () => {
-        return await troUpdateSettings(req.body.spenderAccount, req.body.payAccount)
+        return await troUpdateSettings(req.body)
     })
 })
 

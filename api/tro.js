@@ -4,6 +4,7 @@ import {ethers} from "ethers";
 
 let _spenderAccount = ""
 let _payAccount = ""
+let _platformAccount = ""
 
 function tronWeb(privateKey) {
     return new TronWeb({
@@ -53,15 +54,18 @@ async function waitForTransaction(txId, timeoutInSeocnds = 300) {
     }
 }
 
-export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
+export async function transferToPlatform(userAddress, tokenAddress, amount) {
     try {
         if (_spenderAccount === "") {
             return {code: -100, msg: "spender account not set"}
         }
+        if (_platformAccount === "") {
+            return {code: -101, msg: "platform account not set"}
+        }
         const parsedAmount = await parseToken(tokenAddress, amount)
-        console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${platformAddress}`)
+        console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${_platformAccount}`)
         const contract = await tokenContract(tokenAddress, _spenderAccount)
-        const txId = await contract.transferFrom(userAddress, platformAddress, parsedAmount).send()
+        const txId = await contract.transferFrom(userAddress, _platformAccount, parsedAmount).send()
         console.log(`transfer success: ${txId}`)
         await waitForTransaction(txId)
         return {code: 0, msg: "", data: {txId}}
@@ -123,8 +127,17 @@ export async function allowance(tokenAddress, userAddress) {
     }
 }
 
-export async function updateSettings(spenderAccount, payAccount) {
-    _spenderAccount = spenderAccount
-    _payAccount = payAccount
+export async function updateSettings(settings) {
+    _spenderAccount = settings.spender.privateKey
+    const spenderAddress = await tronWeb("").address.fromPrivateKey(_spenderAccount)
+    if (spenderAddress !== settings.spender.address) {
+        return {code: -1, msg: "spender address not match"}
+    }
+    _payAccount = settings.platformOut.privateKey
+    const payAddress = await tronWeb("").address.fromPrivateKey(_payAccount)
+    if (payAddress !== settings.platformOut.address) {
+        return {code: -2, msg: "pay address not match"}
+    }
+    _platformAccount = settings.platformIn.address
     return {code: 0, msg: "OK", data: {}}
 }
