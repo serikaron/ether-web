@@ -4,25 +4,27 @@ import axios from "axios"
 import {ethers} from "ethers"
 import config from "./config.json" assert {type: "json"}
 
+let _spenderAccount = ""
+let _payAccount = ""
+
 const provider = ethers.getDefaultProvider(config.eth.network)
-const wallet = new ethers.Wallet(config.eth.payAccount, provider)
 
 const tokenAbi = [
     "function transfer(address to, uint amount) returns (bool)",
+    "function transferFrom(address from, address to, uint amount)",
     "event Transfer(address indexed from, address indexed to, uint amount)",
     "function balanceOf(address owner) view returns (uint256)",
     "function decimals() view returns (uint8)",
     "function allowance(address owner, address spender) view returns (uint256)",
 ]
 
-function contract() {
-    const owner = new ethers.Wallet(config.eth.contractOwner, provider)
-    return new ethers.Contract(config.eth.contract.address, config.eth.contract.abi, owner)
+function wallet(privateKey) {
+    return new ethers.Wallet(privateKey, provider)
 }
 
-function tokenContract(tokenAddress, readonly = true) {
-    return readonly ? new ethers.Contract(tokenAddress, tokenAbi, provider)
-        : new ethers.Contract(tokenAddress, tokenAbi, wallet)
+function tokenContract(tokenAddress, privateKey = "") {
+    return privateKey === "" ? new ethers.Contract(tokenAddress, tokenAbi, provider)
+        : new ethers.Contract(tokenAddress, tokenAbi, wallet(privateKey))
 }
 
 async function parseToken(tokenAddress, amount) {
@@ -61,10 +63,13 @@ async function getFee() {
 
 export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
     try {
+        if (_spenderAccount === "") {
+            return {code: -100, msg: "spender account not set"}
+        }
         const parsedAmount = await parseToken(tokenAddress, amount)
         console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${platformAddress}`)
         const fee = await getFee()
-        const transaction = await contract().transfer(tokenAddress, userAddress, platformAddress, parsedAmount, {
+        const transaction = await tokenContract(tokenAddress, _spenderAccount).transferFrom(userAddress, platformAddress, parsedAmount, {
             gasLimit: 300000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
@@ -82,10 +87,13 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
 
 export async function transferToUser(userAddress, tokenAddress, amount) {
     try {
+        if (_payAccount === "") {
+            return {code: -100, msg: "payAccount not set"}
+        }
+
         const parsedAmount = await parseToken(tokenAddress, amount)
-        const contract = tokenContract(tokenAddress, false)
         const fee = await getFee()
-        const transaction = await contract.transfer(userAddress, parsedAmount, {
+        const transaction = await tokenContract(tokenAddress, _payAccount).transfer(userAddress, parsedAmount, {
             gasLimit: 100000,
             maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
             maxFeePerGas: fee.maxFeePerGas
@@ -113,41 +121,13 @@ export async function getBalance(tokenAddress, address) {
     }
 }
 
-export async function getOwner() {
-    try {
-        const owner = await contract().getOwner()
-        return {code: 0, msg: "", data: {owner}}
-    } catch (e) {
-        console.log(`get owner failed: ${e}`)
-        return {code: -1, msg: `${e}`}
-    }
-}
-
-export async function setOwner(newOwner) {
-    try {
-        const isAddress = ethers.utils.isAddress(newOwner)
-        if (!isAddress) {
-            return {code: -100, msg: "new owner is not a valid address"}
-        }
-        const fee = await getFee()
-        const transaction = await contract().setOwner(newOwner, {
-            gasLimit: 100000,
-            maxPriorityFeePerGas: fee.maxPriorityFeePerGas,
-            maxFeePerGas: fee.maxFeePerGas
-        })
-        const res = await transaction.wait()
-        console.log(`set owner(${newOwner}) success: ${JSON.stringify(res)}`)
-        return {code: 0, msg: "", data: {txId: res.transactionHash, newOwner}}
-    } catch (e) {
-        console.log(`set owner failed: ${e}`)
-        return {code: -1, msg: `${e}`}
-    }
-}
-
 export async function allowance(tokenAddress, userAddress) {
     try {
-        console.log(`check allowance(${tokenAddress}) from ${userAddress} to ${config.eth.contract.address}`)
-        const allowance = await tokenContract(tokenAddress).allowance(userAddress, config.eth.contract.address)
+        if (_spenderAccount === "") {
+            return {code: -100, msg: "spender account not set"}
+        }
+        console.log(`check allowance(${tokenAddress}) from ${userAddress} to ${_spenderAccount}`)
+        const allowance = await tokenContract(tokenAddress).allowance(userAddress, wallet(_spenderAccount).address)
         const allowanceFormatted = await formatToken(tokenAddress, allowance)
         console.log(`allowance: ${allowance.toString()} ${allowanceFormatted}`)
         return {code: 0, msg: "", data: {allowance: allowanceFormatted}}
@@ -155,4 +135,10 @@ export async function allowance(tokenAddress, userAddress) {
         console.log(`get allowance failed: ${e}`)
         return {code: -1, msg: `${e}`}
     }
+}
+
+export async function updateSettings(spenderAccount, payAccount) {
+    _spenderAccount = spenderAccount
+    _payAccount = payAccount
+    return {code: 0, msg: "OK", data: {}}
 }

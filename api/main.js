@@ -4,17 +4,15 @@ import {
     transferToPlatform as ethTransferToPlatform,
     transferToUser as ethTransferToUser,
     getBalance as ethGetBalance,
-    getOwner as ethGetOwner,
-    setOwner as ethSetOwner,
     allowance as ethAllowance,
+    updateSettings as ethUpdateSettings,
 } from "./eth.js";
 import {
     transferToPlatform as troTransferToPlatform,
     transferToUser as troTransferToUser,
     getBalance as troGetBalance,
-    getOwner as troGetOwner,
-    setOwner as troSetOwner,
     allowance as troAllowance,
+    updateSettings as troUpdateSettings,
 } from "./tro.js";
 
 const app = express()
@@ -52,21 +50,15 @@ app.get('/eth/token/:token/address/:address/balance', async (req, res) => {
     })
 })
 
-app.post('/eth/owner', async (req, res) => {
-    run(res, async () => {
-        return await ethSetOwner(req.body.owner)
-    })
-})
-
-app.get('/eth/owner', async (req, res) => {
-    run(res, async () => {
-        return await ethGetOwner()
-    })
-})
-
 app.get('/eth/token/:token/address/:address/allowance', async (req, res) => {
     run(res, async () => {
         return await ethAllowance(req.params.token, req.params.address)
+    })
+})
+
+app.post('/eth/settings', async (req, res) => {
+    run(res, async () => {
+        return await ethUpdateSettings(req.body.spenderAccount, req.body.payAccount)
     })
 })
 
@@ -88,21 +80,15 @@ app.get('/tro/token/:token/address/:address/balance', async (req, res) => {
     })
 })
 
-app.get('/tro/owner', async (req, res) => {
-    run(res, async () => {
-        return await troGetOwner()
-    })
-})
-
-app.post('/tro/owner', async (req, res) => {
-    run(res, async () => {
-        return await troSetOwner(req.body.owner)
-    })
-})
-
 app.get('/tro/token/:token/address/:address/allowance', async (req, res) => {
     run(res, async () => {
         return await troAllowance(req.params.token, req.params.address)
+    })
+})
+
+app.post('/tro/settings', async (req, res) => {
+    run(res, async () => {
+        return await troUpdateSettings(req.body.spenderAccount, req.body.payAccount)
     })
 })
 

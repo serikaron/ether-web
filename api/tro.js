@@ -2,11 +2,8 @@ import TronWeb from 'tronweb';
 import config from "./config.json" assert {type: "json"}
 import {ethers} from "ethers";
 
-// const tronWeb = new TronWeb({
-//     fullHost: config.tro.network,
-//     privateKey: config.tro.privateKey,
-//     headers: {"TRON-PRO-API-KEY": config.tro.apiKey},
-// })
+let _spenderAccount = ""
+let _payAccount = ""
 
 function tronWeb(privateKey) {
     return new TronWeb({
@@ -16,13 +13,8 @@ function tronWeb(privateKey) {
     })
 }
 
-async function agentContract() {
-    console.log(`agentContract, address:${config.tro.contract.address}`)
-    return await tronWeb(config.tro.contractOwner).contract().at(config.tro.contract.address)
-}
-
-async function tokenContract(tokenAddress) {
-    return await tronWeb(config.tro.payAccount).contract().at(tokenAddress)
+async function tokenContract(tokenAddress, privateKey = "") {
+    return await tronWeb(privateKey === "" ? _spenderAccount : privateKey).contract().at(tokenAddress)
 }
 
 async function parseToken(tokenAddress, amount) {
@@ -63,10 +55,13 @@ async function waitForTransaction(txId, timeoutInSeocnds = 300) {
 
 export async function transferToPlatform(userAddress, platformAddress, tokenAddress, amount) {
     try {
+        if (_spenderAccount === "") {
+            return {code: -100, msg: "spender account not set"}
+        }
         const parsedAmount = await parseToken(tokenAddress, amount)
         console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) from ${userAddress} to ${platformAddress}`)
-        const contract = await agentContract()
-        const txId = await contract.transfer(tokenAddress, userAddress, platformAddress, parsedAmount).send()
+        const contract = await tokenContract(tokenAddress, _spenderAccount)
+        const txId = await contract.transferFrom(userAddress, platformAddress, parsedAmount).send()
         console.log(`transfer success: ${txId}`)
         await waitForTransaction(txId)
         return {code: 0, msg: "", data: {txId}}
@@ -78,9 +73,12 @@ export async function transferToPlatform(userAddress, platformAddress, tokenAddr
 
 export async function transferToUser(userAddress, tokenAddress, amount) {
     try {
+        if (_payAccount === "") {
+            return {code: -100, msg: "pay account not set"}
+        }
         const parsedAmount = await parseToken(tokenAddress, amount)
         console.log(`Transferring ${amount}(${parsedAmount}) tokens(${tokenAddress}) to ${userAddress}`)
-        const contract = await tokenContract(tokenAddress)
+        const contract = await tokenContract(tokenAddress, _payAccount)
         const transferResult = await contract.transfer(userAddress, parsedAmount).send()
         console.log(`transferToUser: ${transferResult}`)
         await waitForTransaction(transferResult)
@@ -93,7 +91,10 @@ export async function transferToUser(userAddress, tokenAddress, amount) {
 
 export async function getBalance(tokenAddress, address) {
     try {
-        const contract = await tokenContract(tokenAddress)
+        if (_spenderAccount === "") {
+            return {code: -100, msg: "spender account not set"}
+        }
+        const contract = await tokenContract(tokenAddress, _spenderAccount)
         const balance = await contract.balanceOf(address).call()
         const decimals = await contract.decimals().call()
         const balanceFormatted = ethers.utils.formatUnits(balance, decimals)
@@ -105,39 +106,13 @@ export async function getBalance(tokenAddress, address) {
     }
 }
 
-export async function getOwner() {
-    try {
-        const contract = await agentContract()
-        const ownerHex = await contract.getOwner().call()
-        const owner = tronWeb(config.tro.contractOwner).address.fromHex(ownerHex)
-        console.log(`getOwner: ${owner}`)
-        return {code: 0, msg: "", data: {owner}}
-    } catch (e) {
-        console.log(`getOwner: ${e}`)
-        return {code: -1, msg: `${e}`}
-    }
-}
-
-export async function setOwner(newOwner) {
-    try {
-        const isAddress = tronWeb(config.tro.contractOwner).isAddress(newOwner)
-        if (!isAddress) {
-            return {code: -100, msg: `${newOwner} is not a valid address`}
-        }
-        const contract = await agentContract()
-        const txId = await contract.setOwner(newOwner).send()
-        console.log(`setOwner${newOwner} success, tdId: ${txId}`)
-        return {code: 0, msg: "", data: {newOwner, txId}}
-    } catch (e) {
-        console.log(`setOwner: ${e}`)
-        return {code: -1, msg: `${e}`}
-    }
-}
-
 export async function allowance(tokenAddress, userAddress) {
     try {
-        const contract = await tokenContract(tokenAddress)
-        const allowance = await contract.allowance(userAddress, config.tro.contract.address).call()
+        if (_spenderAccount === "") {
+            return {code: -100, msg: "spender account not set"}
+        }
+        const contract = await tokenContract(tokenAddress, _spenderAccount)
+        const allowance = await contract.allowance(userAddress, tronWeb("").address.fromPrivateKey(_spenderAccount)).call()
         const decimals = await contract.decimals().call()
         const allowanceFormatted = ethers.utils.formatUnits(allowance, decimals)
         console.log(`allowance: ${allowance.toString()} ${allowanceFormatted}`)
@@ -146,4 +121,10 @@ export async function allowance(tokenAddress, userAddress) {
         console.log(`allowance: ${e}`)
         return {code: -1, msg: `${e}`}
     }
+}
+
+export async function updateSettings(spenderAccount, payAccount) {
+    _spenderAccount = spenderAccount
+    _payAccount = payAccount
+    return {code: 0, msg: "OK", data: {}}
 }
